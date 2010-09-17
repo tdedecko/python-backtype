@@ -1,0 +1,30 @@
+python-backtype
+---------------
+
+A Python wrapper for the Backtype API.
+
+Usage:
+
+from backtype.api import Backtype
+bt = Backtype(key)
+
+# Comments Search
+bt.comments.search(q='backtype')
+
+# Comments Connect
+bt.comments.connect(url='http://www.techcrunch.com/2009/03/30/if-bitly-is-worth-8-million-tinyurl-is-worth-at-least-46-million/')
+
+# Comments Connect Stats
+bt.comments.connect.stats(url='http://www.techcrunch.com/2009/03/30/if-bitly-is-worth-8-million-tinyurl-is-worth-at-least-46-million/')
+
+# Comments by Author URL
+bt.url.comments(url='http://www.techcrunch.com/')
+
+# Comments by Page
+bt.post.comments(url='http://www.techcrunch.com/2009/03/30/if-bitly-is-worth-8-million-tinyurl-is-worth-at-least-46-million/')
+
+# Comments Stats by Page
+bt.post.stats(url='http://www.techcrunch.com/2009/03/30/if-bitly-is-worth-8-million-tinyurl-is-worth-at-least-46-million/')
+
+# Tweet Stats by URL
+bt.tweetcount(q='http://www.techcrunch.com/2009/03/30/if-bitly-is-worth-8-million-tinyurl-is-worth-at-least-46-million/')

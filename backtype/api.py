@@ -42,15 +42,18 @@ class Backtype(object):
     def __call__(self, **params):
         # Check if action is valid.
 	if not self._action_name in ACTIONS.keys():
+            self._cache_action(params)
+            self._action_name = ''
             raise BacktypeError('%s is an unsupported action.' % self._action_name)
 
-        # Update Params with configuration params
-        updated_params = params.copy()
-        updated_params.update(self._config_params)
+        # Get action, cache action, and update params
+        action = ACTIONS[self._action_name]
+        self._cache_action(params)
+        self._action_name = ''
+        params.update(self._config_params)
 
         # Build request.
-        action = ACTIONS[self._action_name]
-        request_url = action.build_request_url(updated_params)
+        request_url = action.build_request_url(params)
         request = urllib2.Request(request_url)
 
         if not self._user_agent is None:
@@ -67,13 +70,12 @@ class Backtype(object):
 
         # Clean up and save response.
         self.response = response
-        self._cleanup(params)
         return self.response
 
-    def _cleanup(self, params):
+    def _cache_action(self, params):
+        """Cache action and clear current action."""
         self._cached_action_name = self._action_name
         self._cached_params = params.copy()
-        self._action_name = ''
 
 
 class Action(object):
@@ -87,7 +89,7 @@ class Action(object):
 
     def build_request_url(self, params):
         self._check_action(params)
-        action = self._format_url_action()
+        action = self._format_url_action(params)
 
         request_url = '%s%s?%s' % (self.BASE_URL, action, urlencode(params))
         return request_url
@@ -97,7 +99,7 @@ class Action(object):
             if not param in params.keys():
                 raise BacktypeError("'%s' parameter is required for action" % param)
 
-    def _format_url_action(self):
+    def _format_url_action(self, params):
         # Handle non-standard params
         if not self.std_params:
             param_tuple = ()
