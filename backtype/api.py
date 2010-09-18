@@ -66,10 +66,12 @@ class Backtype(object):
             handle = urllib2.urlopen(request)
             response = handle.read()
 	    response = json.loads(response)
-        except urllib2.HTTPError, urllib2.URLError:
+        except urllib2.HTTPError:
             raise BacktypeError('Unable to connect to Backtype using action: %s' % action_name)
         except urllib2.URLError:
             raise BacktypeError('Unable to handle URL: %s' % request_url)
+        except ValueError:
+            raise BacktypeError('Response was not json: %s' % response)
 
         # Clean up and cache response.
 	self._cache_action(action_name, params, response)
