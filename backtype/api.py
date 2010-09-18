@@ -25,12 +25,14 @@ class Backtype(object):
 	self._user_agent = user_agent
 
         self._action_name = ''
-        self._config_params = {'key' : self._key}
+        self._config_params = {}
 
         self._cached_action_name = None
         self._cached_params = None
 
         self.response = ''
+        self.items_per_page = None # Between 10-100
+        self._page = None
 
     def __getattribute__(self, k):
         try:
@@ -41,19 +43,20 @@ class Backtype(object):
 
     def __call__(self, **params):
         # Check if action is valid.
-	if not self._action_name in ACTIONS.keys():
-            self._cache_action(params)
-            self._action_name = ''
-            raise BacktypeError('%s is an unsupported action.' % self._action_name)
+	action_name = self._action_name
+	if not action_name in ACTIONS.keys():
+            self._cleanup()
+            raise BacktypeError('%s is an unsupported action.' % action_name)
 
-        # Get action, cache action, and update params
-        action = ACTIONS[self._action_name]
-        self._cache_action(params)
-        self._action_name = ''
-        params.update(self._config_params)
+        # Get action and build params
+        action = ACTIONS[action_name]
+	self._build_config_params()
+        request_params = params.copy()
+        request_params.update(self._config_params)
+        self._cleanup() # Cleanup in case of unexpected failure.
 
         # Build request.
-        request_url = action.build_request_url(params)
+        request_url = action.build_request_url(request_params)
         request = urllib2.Request(request_url)
 
         if not self._user_agent is None:
@@ -68,14 +71,29 @@ class Backtype(object):
         except urllib2.URLError:
             raise BacktypeError('Unable to handle URL: %s' % request_url)
 
-        # Clean up and save response.
-        self.response = response
-        return self.response
+        # Clean up and cache response.
+	self._cache_action(action_name, params, response)
+        return response
 
-    def _cache_action(self, params):
+    def _cache_action(self, action_name, params, response):
         """Cache action and clear current action."""
-        self._cached_action_name = self._action_name
+        self._cached_action_name = action_name
         self._cached_params = params.copy()
+        self.response = response
+
+    def _build_config_params(self):
+        self._config_params['key'] = self._key
+
+        if not self._page is None:
+            self._config_params['page'] = self._page
+
+        if not self.items_per_page is None:
+            self._config_params['itemsperpage'] = self.items_per_page
+
+    def _cleanup(self):
+        self._action_name = ''
+        self._config_params = {}
+        
 
 
 class Action(object):
