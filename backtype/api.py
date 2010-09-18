@@ -95,7 +95,6 @@ class Backtype(object):
         self._config_params = {}
         
 
-
 class Action(object):
 
     def __init__(self, url_format, req_params, std_params=True):
@@ -106,13 +105,13 @@ class Action(object):
         self.BASE_URL = 'http://api.backtype.com'
 
     def build_request_url(self, params):
-        self._check_action(params)
+        self._check_req_params(params)
         action = self._format_url_action(params)
 
         request_url = '%s%s?%s' % (self.BASE_URL, action, urlencode(params))
         return request_url
 
-    def _check_action(self, params):
+    def _check_req_params(self, params):
         for param in self.req_params:
             if not param in params.keys():
                 raise BacktypeError("'%s' parameter is required for action" % param)
