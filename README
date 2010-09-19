@@ -28,3 +28,6 @@ bt.post.stats(url='http://www.techcrunch.com/2009/03/30/if-bitly-is-worth-8-mill
 
 # Tweet Stats by URL
 bt.tweetcount(q='http://www.techcrunch.com/2009/03/30/if-bitly-is-worth-8-million-tinyurl-is-worth-at-least-46-million/')
+
+# Rate Limit Status
+bt.rate_limit_status()

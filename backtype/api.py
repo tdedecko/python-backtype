@@ -71,7 +71,7 @@ class Backtype(object):
         except urllib2.URLError:
             raise BacktypeError('Unable to handle URL: %s' % request_url)
         except ValueError:
-            raise BacktypeError('Response was not json: %s' % response)
+            raise BacktypeError('Invalid json response received: %s' % response)
 
         # Clean up and cache response.
 	self._cache_action(action_name, params, response)
@@ -138,3 +138,4 @@ ACTIONS['url.comments'] = Action('/url/%s/comments.json', ['url'], std_params=Fa
 ACTIONS['post.comments'] = Action('/post/comments.json', ['url'])
 ACTIONS['post.stats'] = Action('/post/stats.json', ['url'])
 ACTIONS['tweetcount'] = Action('/tweetcount.json', ['q'])
+ACTIONS['rate_limit_status'] = Action('/rate_limit_status.json', [])
